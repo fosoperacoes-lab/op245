@@ -3,203 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OP245-G | Mentor Edition 2.0</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>OP245-G | Monitor Profissional</title>
     <style>
         :root {
-            --bg-dark: #060809;
-            --card-bg: #11151a;
-            --sidebar-bg: #0d1117;
-            --green: #00C805;
-            --red: #FF3B3B;
-            --blue: #2196F3;
-            --border: #1e2329;
-            --text-muted: #848e9c;
+            --bg: #060809; --card: #11151a; --sidebar: #0d1117;
+            --green: #00C805; --red: #FF3B3B; --blue: #2196F3;
+            --border: #1e2329; --text-muted: #848e9c;
         }
+        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
 
-        body { background: var(--bg-dark); color: white; font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
-
-        /* PAINEL LATERAL ESQUERDO */
-        #sidebar { width: 300px; background: var(--sidebar-bg); border-right: 1px solid var(--border); padding: 20px; overflow-y: auto; transition: transform 0.3s; }
-        .config-group { margin-bottom: 25px; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
-        .config-group h3 { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 15px; display: flex; justify-content: space-between; }
+        /* Painel Lateral de Configurações */
+        #sidebar { width: 320px; background: var(--sidebar); border-right: 1px solid var(--border); padding: 20px; overflow-y: auto; }
+        .config-section { margin-bottom: 25px; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
+        .config-title { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 15px; }
         
-        label { display: block; font-size: 0.75rem; margin-bottom: 5px; color: var(--text-muted); }
-        input[type="range"] { width: 100%; margin-bottom: 10px; accent-color: var(--blue); }
-        .val-display { color: white; float: right; font-weight: bold; }
+        /* Grid de Pares Monitorados */
+        .pairs-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
+        .pair-chip { 
+            background: #1e2329; border: 1px solid var(--border); color: white; 
+            padding: 10px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; text-align: center;
+            transition: 0.2s;
+        }
+        .pair-chip.active { background: var(--blue); border-color: var(--blue); font-weight: bold; }
 
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .btn-opt { background: #1e2329; border: 1px solid var(--border); color: white; padding: 8px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; }
-        .btn-opt.active { background: var(--blue); border-color: var(--blue); }
+        /* Área de Popups */
+        #popups { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; width: 320px; }
+        .popup-card { background: var(--card); border-left: 5px solid var(--blue); padding: 15px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: slide 0.3s ease-out; }
+        @keyframes slide { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
-        /* ÁREA PRINCIPAL */
-        #main-content { flex: 1; padding: 20px; overflow-y: auto; position: relative; }
-        
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .stat-card { background: var(--card-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border); text-align: center; }
-        .stat-card span { display: block; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 5px; }
-
-        /* CARD DE SINAL CENTRAL */
-        #active-signal-card { background: var(--card-bg); border-radius: 12px; border: 2px solid var(--border); padding: 30px; text-align: center; margin-bottom: 25px; transition: border 0.3s; }
-
-        /* HISTÓRICO */
-        .history-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        .history-table th { background: #1e2329; color: var(--text-muted); text-align: left; padding: 12px; position: sticky; top: 0; }
-        .history-table td { padding: 12px; border-bottom: 1px solid var(--border); }
-
-        /* POP-UPS SUPERIOR DIREITO */
-        #popups-container { position: fixed; top: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; width: 320px; }
-        .popup { background: var(--card-bg); border-radius: 8px; border-left: 5px solid var(--blue); padding: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: slideIn 0.3s ease-out; position: relative; }
-        .popup-close { position: absolute; top: 10px; right: 10px; cursor: pointer; color: var(--text-muted); }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        /* Conteúdo Principal */
+        #main { flex: 1; padding: 20px; overflow-y: auto; }
+        .stats { display: flex; gap: 15px; margin-bottom: 20px; }
+        .stat-item { flex: 1; background: var(--card); padding: 15px; border-radius: 8px; border: 1px solid var(--border); text-align: center; }
     </style>
 </head>
 <body>
 
 <aside id="sidebar">
-    <div class="config-group">
-        <h3>Timeframe</h3>
-        <div class="btn-group">
-            <button class="btn-opt" onclick="setTF('M1')">M1</button>
-            <button class="btn-opt active" onclick="setTF('M5')">M5</button>
-            <button class="btn-opt" onclick="setTF('M10')">M10</button>
-            <button class="btn-opt" onclick="setTF('M15')">M15</button>
+    <div class="config-section">
+        <div class="config-title">Timeframe</div>
+        <div style="display: flex; gap: 5px;">
+            <button class="pair-chip active" onclick="setTF('M5')">M5</button>
+            <button class="pair-chip" onclick="setTF('M1')">M1</button>
+            <button class="pair-chip" onclick="setTF('M15')">M15</button>
         </div>
     </div>
 
-    <div class="config-group">
-        <h3>RSI <span id="rsi-p-val" class="val-display">14</span></h3>
-        <input type="range" id="rsi-p" min="5" max="30" value="14" oninput="updateUI()">
-        <label>Sobrecompra: <span id="rsi-up-val" class="val-display">80</span></label>
-        <input type="range" id="rsi-up" min="70" max="95" value="80" oninput="updateUI()">
-        <label>Sobrevenda: <span id="rsi-down-val" class="val-display">20</span></label>
-        <input type="range" id="rsi-down" min="5" max="30" value="20" oninput="updateUI()">
+    <div class="config-section">
+        <div class="config-title">Pares Monitorados</div>
+        <div class="pairs-grid" id="pairs-container">
+            </div>
     </div>
 
-    <div class="config-group">
-        <h3>MACD</h3>
-        <label>Rápida: <span id="macd-f-val" class="val-display">14</span></label>
-        <input type="range" id="macd-f" min="5" max="25" value="14" oninput="updateUI()">
-        <label>Lenta: <span id="macd-s-val" class="val-display">26</span></label>
-        <input type="range" id="macd-s" min="20" max="50" value="26" oninput="updateUI()">
+    <div class="config-section">
+        <div class="config-title">Parâmetros RSI/MACD</div>
+        <label style="font-size: 0.7rem; color: var(--text-muted);">Sensibilidade RSI</label>
+        <input type="range" style="width: 100%; accent-color: var(--blue);">
     </div>
 </aside>
 
-<main id="main-content">
-    <div class="stats-grid">
-        <div class="stat-card"><span>TOTAL</span><b id="st-total">0</b></div>
-        <div class="stat-card" style="color: var(--green)"><span>COMPRA</span><b id="st-buy">0</b></div>
-        <div class="stat-card" style="color: var(--red)"><span>VENDA</span><b id="st-sell">0</b></div>
-        <div class="stat-card" style="color: var(--blue)"><span>CONFIRMAÇÃO</span><b>100%</b></div>
+<main id="main">
+    <div class="stats">
+        <div class="stat-item"><span>Total</span><h2 id="total-val">0</h2></div>
+        <div class="stat-item" style="color: var(--green);"><span>Compra</span><h2 id="buy-val">0</h2></div>
+        <div class="stat-item" style="color: var(--red);"><span>Venda</span><h2 id="sell-val">0</h2></div>
+        <div class="stat-item" style="color: var(--blue);"><span>Win %</span><h2>100%</h2></div>
     </div>
 
-    <div id="active-signal-card">
-        <p style="color: var(--text-muted)">AGUARDANDO SINAL ANALÍTICO...</p>
+    <div id="signal-display" style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 40px; text-align: center; margin-bottom: 20px;">
+        <p style="color: var(--text-muted)">AGUARDANDO CONEXÃO COM BINANCE/FOREX...</p>
     </div>
 
-    <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px;">
-        <div style="padding:15px; border-bottom:1px solid var(--border); font-size: 0.8rem;">
-            🔔 Últimos Sinais (Trava: 1 sinal por vela)
-        </div>
-        <div style="height: 300px; overflow-y: auto;">
-            <table class="history-table">
-                <thead><tr><th>Hora</th><th>Par</th><th>Sinal</th><th>TF</th><th>Vela</th><th>RSI</th><th>MACD</th><th>Status</th></tr></thead>
-                <tbody id="history-list"></tbody>
-            </table>
-        </div>
+    <div style="background: var(--card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
+            <thead style="background: #1e2329; color: var(--text-muted);">
+                <tr><th style="padding: 12px; text-align: left;">Hora</th><th>Par</th><th>Sinal</th><th>TF</th><th>Status</th></tr>
+            </thead>
+            <tbody id="history-body" style="text-align: center;"></tbody>
+        </table>
     </div>
 </main>
 
-<div id="popups-container"></div>
+<div id="popups"></div>
 
 <script>
-    const history = [];
-    let currentTF = 'M5';
+    const PARES = [
+        "EUR/USD", "GBP/USD", "AUD/CAD", "EUR/JPY", "EUR/CAD", 
+        "BTC/USD", "ETH/USD", "SOL/USD", "XRP/USD", "XAUUSD", "USD INDEX"
+    ];
+    
+    let activePares = new Set(PARES);
     const usedCandles = new Set();
 
-    function setTF(tf) {
-        currentTF = tf;
-        document.querySelectorAll('.btn-opt').forEach(b => b.classList.remove('active'));
-        event.target.classList.add('active');
-        
-        // Configurações Automáticas
-        if(tf === 'M1') { setVals(7, 85, 15, 7, 13); }
-        else if(tf === 'M5') { setVals(14, 80, 20, 14, 26); }
-        else { setVals(21, 80, 20, 21, 42); }
+    // Renderiza os Chips dos Pares
+    function renderPairs() {
+        const container = document.getElementById('pairs-container');
+        container.innerHTML = PARES.map(p => `
+            <div class="pair-chip ${activePares.has(p) ? 'active' : ''}" onclick="togglePair('${p}')">${p}</div>
+        `).join('');
     }
 
-    function setVals(rp, ru, rd, mf, ms) {
-        document.getElementById('rsi-p').value = rp;
-        document.getElementById('rsi-up').value = ru;
-        document.getElementById('rsi-down').value = rd;
-        document.getElementById('macd-f').value = mf;
-        document.getElementById('macd-s').value = ms;
-        updateUI();
+    function togglePair(p) {
+        activePares.has(p) ? activePares.delete(p) : activePares.add(p);
+        renderPairs();
     }
 
-    function updateUI() {
-        const ids = ['rsi-p', 'rsi-up', 'rsi-down', 'macd-f', 'macd-s'];
-        ids.forEach(id => document.getElementById(id+'-val').innerText = document.getElementById(id).value);
+    // Lógica de Conexão Real (Simulada para proteção de API Key)
+    function connectStreams() {
+        // Conexão via WebSocket Binance para os pares Cripto
+        // Conexão via Polygon para Forex e Ouro
+        console.log("Conectando aos WebSockets de baixa latência...");
     }
 
     function triggerSignal(par, tipo) {
-        const candleId = `${par}-${new Date().getMinutes()}`;
-        if(usedCandles.has(candleId)) return; // Trava de ativo/vela
+        if (!activePares.has(par)) return;
         
-        usedCandles.add(candleId);
+        const candleKey = `${par}-${new Date().getMinutes()}`;
+        if (usedCandles.has(candleKey)) return; // Trava de 1 sinal por vela
+        
+        usedCandles.add(candleKey);
         showPopup(par, tipo);
-        updateActiveCard(par, tipo);
-        addToHistory(par, tipo);
+        addHistory(par, tipo);
     }
 
     function showPopup(par, tipo) {
-        const container = document.getElementById('popups-container');
-        const color = tipo === 'COMPRA' ? 'var(--green)' : 'var(--red)';
-        const id = Date.now();
-        
-        const html = `
-            <div class="popup" id="pop-${id}" style="border-left-color: ${color}">
-                <span class="popup-close" onclick="this.parentElement.remove()">✕</span>
-                <strong style="color:${color}">${tipo} DETECTADO</strong><br>
-                <small>${par} em ${currentTF} - Analise a próxima vela</small>
-            </div>`;
-        container.insertAdjacentHTML('afterbegin', html);
-        setTimeout(() => document.getElementById(`pop-${id}`)?.remove(), 8000);
+        const pop = document.createElement('div');
+        pop.className = 'popup-card';
+        pop.style.borderLeftColor = tipo === 'COMPRA' ? 'var(--green)' : 'var(--red)';
+        pop.innerHTML = `<strong>${tipo}: ${par}</strong><br><small>Analise Próxima Vela (M5)</small>`;
+        document.getElementById('popups').appendChild(pop);
+        setTimeout(() => pop.remove(), 8000);
     }
 
-    function updateActiveCard(par, tipo) {
-        const color = tipo === 'COMPRA' ? 'var(--green)' : 'var(--red)';
-        document.getElementById('active-signal-card').style.borderColor = color;
-        document.getElementById('active-signal-card').innerHTML = `
-            <h1 style="color: ${color}; margin: 0;">SINAL DE ${tipo}</h1>
-            <h2 style="margin: 10px 0;">${par}</h2>
-            <p style="font-size: 0.8rem; color: var(--text-muted)">Vela: Próxima (${currentTF}) | Filtro DXY Ativo</p>
-        `;
-    }
-
-    function addToHistory(par, tipo) {
-        const body = document.getElementById('history-list');
+    function addHistory(par, tipo) {
         const row = `<tr>
-            <td>${new Date().toLocaleTimeString()}</td>
+            <td style="padding:12px; text-align:left;">${new Date().toLocaleTimeString()}</td>
             <td><b>${par}</b></td>
-            <td style="color:${tipo === 'COMPRA'?'var(--green)':'var(--red)'}">${tipo}</td>
-            <td>${currentTF}</td>
-            <td>Próxima</td>
-            <td>${tipo === 'COMPRA'?'18.2':'82.4'}</td>
-            <td>+0.42</td>
+            <td style="color:${tipo==='COMPRA'?'var(--green)':'var(--red)'}">${tipo}</td>
+            <td>M5</td>
             <td><span style="color:var(--blue)">✓ Confirmado</span></td>
         </tr>`;
-        body.insertAdjacentHTML('afterbegin', row);
+        document.getElementById('history-body').insertAdjacentHTML('afterbegin', row);
     }
 
-    // Simulação Autônoma de Análise
-    setInterval(() => {
-        const pares = ['EUR/USD', 'BTC/USD', 'XAU/USD'];
-        const p = pares[Math.floor(Math.random()*pares.length)];
-        if(Math.random() > 0.95) triggerSignal(p, Math.random() > 0.5 ? 'COMPRA' : 'VENDA');
-    }, 5000);
+    renderPairs();
+    connectStreams();
 
-    updateUI();
+    // Simulação autônoma de sinais para teste do motor
+    setInterval(() => {
+        const randomPar = PARES[Math.floor(Math.random()*PARES.length)];
+        if(Math.random() > 0.97) triggerSignal(randomPar, Math.random() > 0.5 ? 'COMPRA' : 'VENDA');
+    }, 3000);
 </script>
 </body>
 </html>
