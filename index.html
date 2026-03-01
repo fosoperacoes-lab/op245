@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OP245-G Sinais v3.6</title>
+    <title>OP245-G Sinais v4.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-body: #050a0e; --bg-sidebar: #0b1217; --bg-card: #0e161e;
             --border: #1c262e; --text-main: #e1e4e8; --text-dim: #707a8a;
             --green: #00c805; --red: #ff3b3b; --blue: #2196f3; --yellow: #f3ba2f;
+            --cyan: #00e5ff;
         }
 
         body { 
@@ -32,7 +33,6 @@
         }
         #sidebar.hidden { margin-left: -320px; }
         
-        /* SCROLLBAR CUSTOMIZADA */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg-sidebar); }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
@@ -40,47 +40,60 @@
         /* CONTEÚDO PRINCIPAL */
         #main { flex: 1; padding: 65px 20px 20px; overflow-y: auto; transition: 0.3s; }
 
-        /* ESTATÍSTICAS E TABELA */
+        /* HEADER DE ESTATÍSTICAS */
+        .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .section-header h3 { margin: 0; font-size: 14px; color: var(--text-main); font-weight: 600; display: flex; align-items: center; gap: 5px; }
+        .header-badge { background: var(--blue); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+        .header-badge.vela { background: #1e2329; border: 1px solid var(--border); color: var(--text-dim); }
+
+        /* CARDS */
         .stats-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 25px; }
         .stat-card { background: var(--bg-card); padding: 15px; border-radius: 6px; border: 1px solid var(--border); }
         .stat-card span { color: var(--text-dim); font-size: 11px; display: block; margin-bottom: 5px; }
         .stat-card h2 { margin: 0; font-size: 20px; font-weight: 600; }
 
+        /* TABELA */
         .table-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
         table { width: 100%; border-collapse: collapse; }
         th { background: #0c141b; color: var(--text-dim); padding: 12px; font-size: 10px; text-transform: uppercase; text-align: left; border-bottom: 1px solid var(--border); }
         td { padding: 10px 12px; border-bottom: 1px solid #141d26; font-size: 12px; }
 
-        /* BADGES & BOTOES */
+        /* BADGES */
         .badge-buy { color: var(--green); border: 1px solid var(--green); padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 10px; }
         .badge-sell { color: var(--red); border: 1px solid var(--red); padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 10px; }
+        .status-conf { color: var(--blue); border: 1px solid var(--blue); padding: 2px 6px; border-radius: 12px; font-size: 10px; }
+        .status-pend { color: var(--yellow); border: 1px solid var(--yellow); padding: 2px 6px; border-radius: 12px; font-size: 10px; }
+        
         .icon-btn { cursor: pointer; font-size: 18px; padding: 5px; border-radius: 4px; transition: 0.2s; display: inline-flex; }
         .icon-btn:hover { background: var(--border); }
         
-        /* CONTROLES MULTI-SELEÇÃO */
+        /* CONTROLES E GRID TAGS */
         .grid-tags { display: grid; gap: 5px; margin-top: 8px; }
         .grid-2 { grid-template-columns: 1fr 1fr; }
         .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
         .grid-4 { grid-template-columns: repeat(4, 1fr); }
         
-        .tag-btn { 
-            background: #1e2329; border: 1px solid var(--border); padding: 8px 4px; 
-            font-size: 10px; text-align: center; border-radius: 4px; cursor: pointer; color: var(--text-dim); transition: 0.2s;
-        }
+        .tag-btn { background: #1e2329; border: 1px solid var(--border); padding: 8px 4px; font-size: 10px; text-align: center; border-radius: 4px; cursor: pointer; color: var(--text-dim); transition: 0.2s; }
         .tag-btn.active { background: rgba(33, 150, 243, 0.15); border-color: var(--blue); color: var(--blue); font-weight: bold; }
-        .tag-btn:hover:not(.active) { border-color: #3b4554; }
+        
+        /* CHECKBOXES E SLIDERS */
+        .chk-group { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+        .chk-label { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-main); cursor: pointer; }
+        input[type="checkbox"] { accent-color: var(--blue); cursor: pointer; }
 
-        /* SLIDERS AVANÇADOS */
         .config-block { margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
         .config-block:last-child { border-bottom: none; }
         .slider-row { margin-top: 12px; }
         .slider-header { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-dim); margin-bottom: 4px; }
         .slider-header b { color: var(--text-main); font-weight: normal; }
+        
         input[type="range"] { width: 100%; height: 3px; background: #2b3139; outline: none; -webkit-appearance: none; border-radius: 2px; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: var(--blue); border-radius: 50%; cursor: pointer; }
+        input[type="range"]:disabled { opacity: 0.4; cursor: not-allowed; }
+        input[type="range"]:disabled::-webkit-slider-thumb { background: #555; }
 
         #popup-container { position: fixed; top: 60px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-        .popup-alert { background: var(--bg-sidebar); border: 1px solid var(--border); border-left: 4px solid var(--blue); padding: 15px; border-radius: 6px; width: 260px; animation: slideIn 0.3s ease-out; pointer-events: all; }
+        .popup-alert { background: var(--bg-sidebar); border: 1px solid var(--border); border-left: 4px solid var(--blue); padding: 15px; border-radius: 6px; width: 260px; animation: slideIn 0.3s ease-out; pointer-events: all; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         @keyframes slideIn { from { transform: translateX(110%); } to { transform: translateX(0); } }
     </style>
 </head>
@@ -89,7 +102,7 @@
 <nav class="top-nav">
     <div style="display:flex; align-items:center; gap:10px;">
         <span class="icon-btn" onclick="toggleSidebar()">⚙️</span>
-        <span style="color:var(--blue); font-weight:bold; margin-left: 10px;">OP245-G Sinais v3.6</span>
+        <span style="color:var(--blue); font-weight:bold; margin-left: 10px;">OP245-G Sinais v4.0</span>
     </div>
     <div style="display:flex; gap:15px; align-items:center;">
         <span id="btn-audio" class="icon-btn" onclick="toggleAudio()">🔊</span>
@@ -107,6 +120,11 @@
             <div class="tag-btn active" id="vela-atual" onclick="toggleVela('Atual')">Vela Atual</div>
             <div class="tag-btn active" id="vela-prox" onclick="toggleVela('Próxima')">Próxima Vela</div>
         </div>
+        
+        <div class="chk-group">
+            <label class="chk-label"><input type="checkbox" id="chk-popup" checked onchange="settings.popup = this.checked"> Mostrar Alertas Pop-up</label>
+            <label class="chk-label"><input type="checkbox" id="chk-fechamento" onchange="settings.confirmClose = this.checked"> Confirmar no Fechamento</label>
+        </div>
     </div>
 
     <div class="config-block">
@@ -117,12 +135,12 @@
             <div class="tag-btn tf-btn" id="tf-M10" onclick="toggleTF('M10')">M10</div>
             <div class="tag-btn tf-btn" id="tf-M15" onclick="toggleTF('M15')">M15</div>
         </div>
-        <div class="tag-btn" onclick="toggleAllTF()" style="width: 100%; display:block; padding: 6px 0;">Todas</div>
+        <div class="tag-btn" id="btn-todas-tf" onclick="toggleAllTF()" style="width: 100%; display:block; padding: 6px 0;">Todas</div>
     </div>
 
     <div class="config-block">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <label style="font-size:11px; color:var(--text-dim); font-weight:bold; text-transform:uppercase;">Pares</label>
+            <label style="font-size:11px; color:var(--text-dim); font-weight:bold; text-transform:uppercase;">Pares Monitorados</label>
             <div style="display:flex; gap:5px;">
                 <span style="font-size:9px; color:var(--blue); cursor:pointer;" onclick="bulkAssets(true)">Todos</span>
                 <span style="font-size:9px; color:var(--text-dim); cursor:pointer;" onclick="bulkAssets(false)">Nenhum</span>
@@ -132,18 +150,18 @@
     </div>
 
     <div class="config-block">
-        <label style="font-size:11px; color:var(--text-dim); font-weight:bold; text-transform:uppercase;">RSI</label>
+        <label style="font-size:11px; color:var(--text-dim); font-weight:bold; text-transform:uppercase;">RSI <span id="rsi-lock-msg" style="color:var(--yellow); font-size:9px; display:none;">(Bloqueado - Automático)</span></label>
         <div class="slider-row">
             <div class="slider-header"><span>Período:</span> <b id="val-rsi-p">14</b></div>
-            <input type="range" id="cfg-rsi-p" min="2" max="30" value="14" oninput="syncVal(this, 'val-rsi-p')">
+            <input type="range" class="ind-slider" id="cfg-rsi-p" min="2" max="30" value="14" oninput="syncVal(this, 'val-rsi-p')">
         </div>
         <div class="slider-row">
             <div class="slider-header"><span>Sobrecompra:</span> <b id="val-rsi-up">80</b></div>
-            <input type="range" id="cfg-rsi-up" min="50" max="100" value="80" oninput="syncVal(this, 'val-rsi-up')">
+            <input type="range" class="ind-slider" id="cfg-rsi-up" min="50" max="100" value="80" oninput="syncVal(this, 'val-rsi-up')">
         </div>
         <div class="slider-row">
             <div class="slider-header"><span>Sobrevenda:</span> <b id="val-rsi-dw">20</b></div>
-            <input type="range" id="cfg-rsi-dw" min="0" max="50" value="20" oninput="syncVal(this, 'val-rsi-dw')">
+            <input type="range" class="ind-slider" id="cfg-rsi-dw" min="0" max="50" value="20" oninput="syncVal(this, 'val-rsi-dw')">
         </div>
     </div>
 
@@ -151,33 +169,37 @@
         <label style="font-size:11px; color:var(--text-dim); font-weight:bold; text-transform:uppercase;">MACD</label>
         <div class="slider-row">
             <div class="slider-header"><span>EMA Rápida:</span> <b id="val-macd-f">12</b></div>
-            <input type="range" id="cfg-macd-f" min="5" max="30" value="12" oninput="syncVal(this, 'val-macd-f')">
+            <input type="range" class="ind-slider" id="cfg-macd-f" min="5" max="30" value="12" oninput="syncVal(this, 'val-macd-f')">
         </div>
         <div class="slider-row">
             <div class="slider-header"><span>EMA Lenta:</span> <b id="val-macd-s">26</b></div>
-            <input type="range" id="cfg-macd-s" min="10" max="50" value="26" oninput="syncVal(this, 'val-macd-s')">
+            <input type="range" class="ind-slider" id="cfg-macd-s" min="10" max="50" value="26" oninput="syncVal(this, 'val-macd-s')">
         </div>
         <div class="slider-row">
             <div class="slider-header"><span>Sinal:</span> <b id="val-macd-sig">9</b></div>
-            <input type="range" id="cfg-macd-sig" min="2" max="20" value="9" oninput="syncVal(this, 'val-macd-sig')">
+            <input type="range" class="ind-slider" id="cfg-macd-sig" min="2" max="20" value="9" oninput="syncVal(this, 'val-macd-sig')">
         </div>
     </div>
 </aside>
 
 <main id="main">
+    <div class="section-header">
+        <h3>📊 Estatísticas de Sinais <span id="stat-badges-tf"></span> <span id="stat-badges-vela"></span></h3>
+    </div>
+
     <div class="stats-grid">
         <div class="stat-card"><span>Total</span><h2 id="st-total">0</h2></div>
         <div class="stat-card"><span>Compra</span><h2 id="st-buy" style="color:var(--green)">0</h2></div>
         <div class="stat-card"><span>Venda</span><h2 id="st-sell" style="color:var(--red)">0</h2></div>
         <div class="stat-card"><span>Confirmados</span><h2 id="st-conf" style="color:var(--blue)">0</h2></div>
         <div class="stat-card"><span>Pendentes</span><h2 id="st-pend" style="color:var(--yellow)">0</h2></div>
-        <div class="stat-card"><span>Velas Analisadas</span><h2 id="st-velas" style="color:var(--text-main)">Ativas</h2></div>
+        <div class="stat-card"><span>% Confirmação</span><h2 id="st-rate" style="color:var(--cyan)">0.0%</h2></div>
     </div>
 
     <div class="table-section">
         <table>
             <thead>
-                <tr><th>Hora Sinal</th><th>Par</th><th>Sinal</th><th>TF</th><th>Alvo</th><th>Vela (Abertura)</th><th>RSI</th><th>MACD</th></tr>
+                <tr><th>Hora Sinal</th><th>Par</th><th>Sinal</th><th>TF</th><th>Vela (Abertura)</th><th>RSI</th><th>MACD</th><th>Status</th></tr>
             </thead>
             <tbody id="signal-rows"></tbody>
         </table>
@@ -190,63 +212,112 @@
     let selectedTFs = new Set(['M1', 'M5']);
     let selectedVelas = new Set(['Atual', 'Próxima']);
     
+    // SISTEMA ANTI-REPINTURA (Dicionário de Travas)
+    let lockedSignals = new Map(); 
+
+    let settings = { popup: true, confirmClose: false };
     let isPaused = false;
     let isMuted = false;
-    let stats = { total: 0, buy: 0, sell: 0, conf: 0 };
+    let stats = { total: 0, buy: 0, sell: 0, conf: 0, pend: 0 };
 
-    // FUNÇÕES DE ÁUDIO
+    // ÁUDIO
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playSignalSound(type) {
         if(isMuted) return;
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
+        osc.connect(gain); gain.connect(audioCtx.destination);
         osc.frequency.setValueAtTime(type === 'COMPRA' ? 1050 : 320, audioCtx.currentTime); 
         osc.type = type === 'COMPRA' ? 'sine' : 'triangle';
         gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
         osc.start(); osc.stop(audioCtx.currentTime + 0.25);
     }
 
-    // INICIALIZAÇÃO E CONTROLES DE UI
     function init() {
         document.getElementById('asset-selector').innerHTML = ASSETS.map(a => 
             `<div class="tag-btn active" id="ast-${a.replace('/','')}" onclick="toggleAsset('${a}')">${a}</div>`
         ).join('');
+        updateStatHeader();
+        updatePresets();
         setInterval(updateClock, 1000);
-        setInterval(generateSignal, 6000);
+        setInterval(generateSignal, 4000); // Ticks de análise
     }
 
     function syncVal(el, targetId) { document.getElementById(targetId).innerText = el.value; }
     function toggleSidebar() { document.getElementById('sidebar').classList.toggle('hidden'); }
     function toggleAudio() { isMuted = !isMuted; document.getElementById('btn-audio').innerText = isMuted ? '🔇' : '🔊'; }
-    function togglePause() { 
-        isPaused = !isPaused; 
-        document.getElementById('btn-pause').style.color = isPaused ? 'var(--red)' : 'var(--text-main)'; 
-    }
+    function togglePause() { isPaused = !isPaused; document.getElementById('btn-pause').style.color = isPaused ? 'var(--red)' : 'var(--text-main)'; }
     function updateClock() { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }
 
-    // FILTROS MULTI-SELEÇÃO
+    // ATUALIZAÇÃO DO CABEÇALHO DE ESTATÍSTICAS
+    function updateStatHeader() {
+        const tfHtml = Array.from(selectedTFs).map(tf => `<span class="header-badge">${tf}</span>`).join('');
+        const velaHtml = Array.from(selectedVelas).map(v => `<span class="header-badge vela">${v}</span>`).join('');
+        document.getElementById('stat-badges-tf').innerHTML = tfHtml;
+        document.getElementById('stat-badges-vela').innerHTML = velaHtml;
+    }
+
+    // AUTOMATIZAÇÃO INTELIGENTE DE PRESETS RSI/MACD
+    function updatePresets() {
+        const hasM10 = selectedTFs.has('M10');
+        const hasTodas = selectedTFs.size === 4;
+        const sliders = document.querySelectorAll('.ind-slider');
+        const lockMsg = document.getElementById('rsi-lock-msg');
+
+        if (hasTodas || hasM10) {
+            // BLOQUEIA EDIÇÃO e seta M10/M15 default
+            sliders.forEach(s => s.disabled = true);
+            lockMsg.style.display = 'inline';
+            setRSIValues(21, 80, 20);
+        } else {
+            // DESBLOQUEIA EDIÇÃO
+            sliders.forEach(s => s.disabled = false);
+            lockMsg.style.display = 'none';
+            
+            // Se apenas 1 TF selecionado, aplica o preset
+            if (selectedTFs.size === 1) {
+                if (selectedTFs.has('M1')) setRSIValues(7, 85, 15);
+                else if (selectedTFs.has('M5')) setRSIValues(14, 80, 20);
+                else if (selectedTFs.has('M15')) setRSIValues(21, 80, 20);
+            }
+        }
+        updateStatHeader();
+    }
+
+    function setRSIValues(p, up, dw) {
+        document.getElementById('cfg-rsi-p').value = p; syncVal(document.getElementById('cfg-rsi-p'), 'val-rsi-p');
+        document.getElementById('cfg-rsi-up').value = up; syncVal(document.getElementById('cfg-rsi-up'), 'val-rsi-up');
+        document.getElementById('cfg-rsi-dw').value = dw; syncVal(document.getElementById('cfg-rsi-dw'), 'val-rsi-dw');
+    }
+
+    // TOGGLES DE UI
     function toggleVela(tipo) {
-        const id = tipo === 'Atual' ? 'vela-atual' : 'vela-prox';
-        const el = document.getElementById(id);
+        const el = document.getElementById(tipo === 'Atual' ? 'vela-atual' : 'vela-prox');
         selectedVelas.has(tipo) ? (selectedVelas.delete(tipo), el.classList.remove('active')) : (selectedVelas.add(tipo), el.classList.add('active'));
-        document.getElementById('st-velas').innerText = Array.from(selectedVelas).join(' & ') || 'Nenhuma';
+        updateStatHeader();
     }
 
     function toggleTF(tf) {
         const el = document.getElementById(`tf-${tf}`);
         selectedTFs.has(tf) ? (selectedTFs.delete(tf), el.classList.remove('active')) : (selectedTFs.add(tf), el.classList.add('active'));
+        document.getElementById('btn-todas-tf').classList.remove('active');
+        updatePresets();
     }
 
     function toggleAllTF() {
         const allTFs = ['M1', 'M5', 'M10', 'M15'];
-        const isActive = selectedTFs.size > 0;
-        allTFs.forEach(tf => {
-            const el = document.getElementById(`tf-${tf}`);
-            if(isActive) { selectedTFs.delete(tf); el.classList.remove('active'); }
-            else { selectedTFs.add(tf); el.classList.add('active'); }
-        });
+        const btn = document.getElementById('btn-todas-tf');
+        const isActive = btn.classList.contains('active');
+        
+        if(isActive) {
+            selectedTFs.clear();
+            allTFs.forEach(tf => document.getElementById(`tf-${tf}`).classList.remove('active'));
+            btn.classList.remove('active');
+        } else {
+            allTFs.forEach(tf => { selectedTFs.add(tf); document.getElementById(`tf-${tf}`).classList.add('active'); });
+            btn.classList.add('active');
+        }
+        updatePresets();
     }
 
     function toggleAsset(a) {
@@ -261,69 +332,78 @@
         });
     }
 
-    // CÁLCULO MATEMÁTICO DA VELA
+    // CÁLCULO DE VELA
     function getCandleTime(tf, tipoVela) {
         const now = new Date();
-        let minutes = now.getMinutes();
-        let hours = now.getHours();
-        let step = parseInt(tf.replace('M', '')); // Extrai 1, 5, 10 ou 15
+        let min = now.getMinutes(), hrs = now.getHours();
+        let step = parseInt(tf.replace('M', ''));
+        let startMin = Math.floor(min / step) * step;
         
-        let candleStartMin = Math.floor(minutes / step) * step;
-        
-        if (tipoVela === 'Próxima') {
-            candleStartMin += step;
-        }
-
-        if (candleStartMin >= 60) {
-            candleStartMin -= 60;
-            hours = (hours + 1) % 24;
-        }
-
-        return `${hours.toString().padStart(2, '0')}:${candleStartMin.toString().padStart(2, '0')}:00`;
+        if (tipoVela === 'Próxima') startMin += step;
+        if (startMin >= 60) { startMin -= 60; hrs = (hrs + 1) % 24; }
+        return `${hrs.toString().padStart(2, '0')}:${startMin.toString().padStart(2, '0')}:00`;
     }
 
-    // GERAÇÃO DE SINAIS
+    // GERAÇÃO DE SINAIS E TRAVA ANTI-RUÍDO
     function generateSignal() {
         if(isPaused || selectedAssets.size === 0 || selectedTFs.size === 0 || selectedVelas.size === 0) return;
         
-        // Sorteia base nas seleções ativas
         const pair = Array.from(selectedAssets)[Math.floor(Math.random() * selectedAssets.size)];
         const tf = Array.from(selectedTFs)[Math.floor(Math.random() * selectedTFs.size)];
         const velaType = Array.from(selectedVelas)[Math.floor(Math.random() * selectedVelas.size)];
-        const type = Math.random() > 0.5 ? 'COMPRA' : 'VENDA';
-        
         const candleTime = getCandleTime(tf, velaType);
         
-        // Simula Indicadores baseados na configuração atual
-        const rsiCfg = document.getElementById('cfg-rsi-p').value;
-        const macdCfg = document.getElementById('cfg-macd-f').value;
-        const simRSI = (Math.random() * 100).toFixed(1);
-        const simMACD = (Math.random() * 2 - 1).toFixed(4);
+        // REGRA 1: Filtro de Unicidade / Anti-Repintura
+        const signalKey = `${pair}_${tf}_${candleTime}`;
+        if (lockedSignals.has(signalKey)) return; // Bloqueia se já enviou sinal pra esta vela/ativo
 
+        // Probabilidade reduzida para não flodar a tela instantaneamente
+        if(Math.random() > 0.4) return; 
+
+        lockedSignals.set(signalKey, true); // Trava o ativo/vela
+
+        const type = Math.random() > 0.5 ? 'COMPRA' : 'VENDA';
+        
+        // Lógica do Status baseado no Toggle "Confirmar no Fechamento"
+        let isConfirmed = !settings.confirmClose || Math.random() > 0.5; 
+        
         playSignalSound(type);
-        showPopup(pair, type, tf, velaType);
+        if(settings.popup) showPopup(pair, type, tf, velaType);
 
-        // Atualiza Stats
-        stats.total++; type === 'COMPRA' ? stats.buy++ : stats.sell++; stats.conf++;
+        // ATUALIZAÇÃO DE STATS
+        stats.total++; 
+        type === 'COMPRA' ? stats.buy++ : stats.sell++; 
+        isConfirmed ? stats.conf++ : stats.pend++;
+        
+        const rate = ((stats.conf / stats.total) * 100).toFixed(1);
+
         document.getElementById('st-total').innerText = stats.total;
         document.getElementById('st-buy').innerText = stats.buy;
         document.getElementById('st-sell').innerText = stats.sell;
         document.getElementById('st-conf').innerText = stats.conf;
+        document.getElementById('st-pend').innerText = stats.pend;
+        document.getElementById('st-rate').innerText = `${rate}%`;
+
+        // INSERE NA TABELA
+        const statusBadge = isConfirmed ? '<span class="status-conf">✓ Confirmado</span>' : '<span class="status-pend">⏳ Pendente</span>';
 
         const row = `<tr>
             <td>${new Date().toLocaleTimeString()}</td>
             <td><b>${pair}</b></td>
             <td><span class="${type === 'COMPRA' ? 'badge-buy' : 'badge-sell'}">${type}</span></td>
-            <td><span style="background:var(--blue); padding:2px 5px; border-radius:3px; font-size:10px;">${tf}</span></td>
-            <td style="color:var(--text-dim); font-size:11px;">${velaType}</td>
-            <td style="color:white; font-family:monospace; font-size:13px;">${candleTime}</td>
-            <td>${simRSI} <span style="font-size:9px; color:var(--text-dim)">(p:${rsiCfg})</span></td>
-            <td style="color:${simMACD > 0 ? 'var(--green)' : 'var(--red)'}">${simMACD} <span style="font-size:9px; color:var(--text-dim)">(f:${macdCfg})</span></td>
+            <td><span style="background:var(--blue); padding:2px 5px; border-radius:3px; font-size:10px; color:white;">${tf}</span></td>
+            <td style="font-family:monospace; font-size:12px;">${candleTime} <span style="font-size:9px; color:var(--text-dim)">(${velaType})</span></td>
+            <td>${(Math.random() * 100).toFixed(1)}</td>
+            <td style="color:${Math.random() > 0.5 ? 'var(--green)' : 'var(--red)'}">${(Math.random() * 2 - 1).toFixed(4)}</td>
+            <td>${statusBadge}</td>
         </tr>`;
         
         const tbody = document.getElementById('signal-rows');
         tbody.insertAdjacentHTML('afterbegin', row);
         if(tbody.children.length > 20) tbody.lastElementChild.remove();
+        
+        // Limpeza periódica do mapa de travas para economizar memória
+        if(lockedSignals.size > 200) lockedSignals.clear();
     }
 
     function showPopup(pair, type, tf, velaType) {
@@ -331,7 +411,9 @@
         const color = type === 'COMPRA' ? 'var(--green)' : 'var(--red)';
         const html = `
             <div class="popup-alert" id="${id}" style="border-left-color: ${color}">
-                <div style="font-size:10px; color:var(--text-dim); margin-bottom:4px;">${tf} | ${velaType} Vela</div>
+                <div style="font-size:10px; color:var(--text-dim); margin-bottom:4px; display:flex; justify-content:space-between;">
+                    <span>${tf} | ${velaType} Vela</span> <span>Agora</span>
+                </div>
                 <div style="font-weight:bold; color:${color}; font-size:14px;">${type} - ${pair}</div>
             </div>`;
         document.getElementById('popup-container').insertAdjacentHTML('afterbegin', html);
