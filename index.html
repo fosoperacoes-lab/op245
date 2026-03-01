@@ -2,8 +2,8 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OP245-G Sinais v4.5</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OP245-G Sinais v4.6</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -13,6 +13,9 @@
             --cyan: #00e5ff;
         }
 
+        /* Correção global de box-sizing para evitar vazamentos de layout */
+        *, *::before, *::after { box-sizing: border-box; }
+
         body { 
             background: var(--bg-body); color: var(--text-main); font-family: 'Inter', sans-serif; 
             margin: 0; display: flex; height: 100vh; overflow: hidden; font-size: 13px;
@@ -20,49 +23,56 @@
 
         /* HEADER */
         .top-nav {
-            position: fixed; top: 0; left: 0; right: 0; height: 45px;
+            position: fixed; top: 0; left: 0; right: 0; height: 50px;
             background: var(--bg-sidebar); border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center; padding: 0 20px; z-index: 1000;
+            display: flex; justify-content: space-between; align-items: center; padding: 0 15px; z-index: 1000;
         }
 
-        /* SIDEBAR */
+        /* SIDEBAR (MENU LATERAL) */
         #sidebar { 
-            width: 330px; background: var(--bg-sidebar); border-right: 1px solid var(--border); 
-            padding: 60px 15px 15px; overflow-y: auto; height: 100%;
+            width: 320px; background: var(--bg-sidebar); border-right: 1px solid var(--border); 
+            padding: 65px 15px 15px; overflow-y: auto; height: 100%;
             transition: transform 0.3s ease, margin-left 0.3s ease;
         }
-        #sidebar.hidden { margin-left: -330px; }
+        #sidebar.hidden { margin-left: -320px; }
         
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: var(--bg-sidebar); }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
         /* CONTEÚDO PRINCIPAL */
-        #main { flex: 1; padding: 65px 20px 20px; overflow-y: auto; transition: 0.3s; }
+        #main { flex: 1; padding: 65px 15px 20px; overflow-y: auto; transition: 0.3s; width: 100%; }
 
-        .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
-        .section-header h3 { margin: 0; font-size: 14px; color: var(--text-main); font-weight: 600; display: flex; align-items: center; gap: 5px; }
+        .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .section-header h3 { margin: 0; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
         .header-badge { background: var(--blue); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
         .header-badge.vela { background: #1e2329; border: 1px solid var(--border); color: var(--text-dim); }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 25px; }
-        .stat-card { background: var(--bg-card); padding: 15px; border-radius: 6px; border: 1px solid var(--border); }
-        .stat-card span { color: var(--text-dim); font-size: 11px; display: block; margin-bottom: 5px; }
-        .stat-card h2 { margin: 0; font-size: 20px; font-weight: 600; }
+        /* CARDS ESTATÍSTICAS */
+        .stats-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 20px; }
+        .stat-card { background: var(--bg-card); padding: 12px; border-radius: 6px; border: 1px solid var(--border); }
+        .stat-card span { color: var(--text-dim); font-size: 11px; display: block; margin-bottom: 4px; white-space: nowrap; }
+        .stat-card h2 { margin: 0; font-size: 18px; font-weight: 600; }
 
-        .table-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #0c141b; color: var(--text-dim); padding: 12px; font-size: 10px; text-transform: uppercase; text-align: left; border-bottom: 1px solid var(--border); }
-        td { padding: 10px 12px; border-bottom: 1px solid #141d26; font-size: 12px; transition: 0.3s; }
+        /* TABELA DE SINAIS (COM SCROLL HORIZONTAL) */
+        .table-section { 
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; 
+            overflow-x: auto; /* Permite rolar a tabela em celulares */
+            -webkit-overflow-scrolling: touch; /* Rolagem suave no iOS */
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 750px; /* Trava a largura mínima para as colunas não sumirem */ }
+        th { background: #0c141b; color: var(--text-dim); padding: 12px 10px; font-size: 10px; text-transform: uppercase; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+        td { padding: 10px; border-bottom: 1px solid #141d26; font-size: 12px; white-space: nowrap; transition: 0.3s; }
 
         .badge-buy { color: var(--green); border: 1px solid var(--green); padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 10px; }
         .badge-sell { color: var(--red); border: 1px solid var(--red); padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 10px; }
         .status-conf { color: var(--blue); border: 1px solid var(--blue); padding: 2px 6px; border-radius: 12px; font-size: 10px; }
         .status-pend { color: var(--yellow); border: 1px solid var(--yellow); padding: 2px 6px; border-radius: 12px; font-size: 10px; }
         
-        .icon-btn { cursor: pointer; font-size: 18px; padding: 5px; border-radius: 4px; transition: 0.2s; display: inline-flex; }
+        .icon-btn { cursor: pointer; font-size: 18px; padding: 6px; border-radius: 4px; transition: 0.2s; display: inline-flex; }
         .icon-btn:hover { background: var(--border); }
         
+        /* GRIDS DE BOTÕES */
         .grid-tags { display: grid; gap: 5px; margin-top: 8px; }
         .grid-2 { grid-template-columns: 1fr 1fr; }
         .grid-3 { grid-template-columns: repeat(3, 1fr); }
@@ -81,11 +91,11 @@
         .slider-header b { color: var(--text-main); font-weight: normal; }
         
         input[type="range"] { width: 100%; height: 3px; background: #2b3139; outline: none; -webkit-appearance: none; border-radius: 2px; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: var(--blue); border-radius: 50%; cursor: pointer; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: var(--blue); border-radius: 50%; cursor: pointer; }
         input[type="range"]:disabled { opacity: 0.4; cursor: not-allowed; }
         input[type="range"]:disabled::-webkit-slider-thumb { background: #555; }
 
-        /* NOVO DESIGN DO POPUP */
+        /* POPUP DESIGN */
         #popup-container { position: fixed; top: 60px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .popup-alert { 
             padding: 15px; border-radius: 8px; width: 280px; 
@@ -101,19 +111,44 @@
 
         @keyframes slideIn { from { transform: translateX(110%); } to { transform: translateX(0); } }
         @keyframes fadeOutRow { to { opacity: 0; transform: scale(0.98); } }
+
+        /* MEDIA QUERIES PARA CELULARES E TABLETS */
+        @media (max-width: 900px) {
+            .stats-grid { grid-template-columns: repeat(3, 1fr); } /* Tablet: 3 colunas */
+        }
+
+        @media (max-width: 600px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); } /* Celular: 2 colunas */
+            .stat-card h2 { font-size: 16px; }
+            
+            #sidebar {
+                position: fixed; top: 50px; left: 0; height: calc(100vh - 50px);
+                z-index: 1001; margin-left: 0; transform: translateX(0);
+                box-shadow: 5px 0 20px rgba(0,0,0,0.8); width: 290px;
+            }
+            #sidebar.hidden { transform: translateX(-100%); }
+            
+            #popup-container {
+                top: 60px; right: 0; left: 0; align-items: center; width: 100%;
+            }
+            .popup-alert { width: 90%; max-width: 320px; animation: slideDown 0.3s ease-out; }
+            
+            @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+            @keyframes slideIn { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        }
     </style>
 </head>
 <body>
 
 <nav class="top-nav">
-    <div style="display:flex; align-items:center; gap:10px;">
+    <div style="display:flex; align-items:center; gap:8px;">
         <span class="icon-btn" onclick="toggleSidebar()">⚙️</span>
-        <span style="color:var(--blue); font-weight:bold; margin-left: 10px;">OP245-G Sinais v4.5</span>
+        <span style="color:var(--blue); font-weight:bold; font-size: 14px;">OP245-G v4.6</span>
     </div>
-    <div style="display:flex; gap:15px; align-items:center;">
+    <div style="display:flex; gap:10px; align-items:center;">
         <span id="btn-audio" class="icon-btn" onclick="toggleAudio()">🔊</span>
         <span id="btn-pause" class="icon-btn" onclick="togglePause()">🔔</span>
-        <div id="clock" style="font-weight: bold; font-family: monospace; color: var(--blue); width: 65px;">00:00:00</div>
+        <div id="clock" style="font-weight: bold; font-family: monospace; color: var(--blue); font-size:12px;">00:00:00</div>
     </div>
 </nav>
 
@@ -126,7 +161,6 @@
             <div class="tag-btn active" id="vela-atual" onclick="toggleVela('Atual')">Vela Atual</div>
             <div class="tag-btn active" id="vela-prox" onclick="toggleVela('Próxima')">Próxima Vela</div>
         </div>
-        
         <div class="chk-group">
             <label class="chk-label"><input type="checkbox" id="chk-popup" checked onchange="settings.popup = this.checked"> Mostrar Alertas Pop-up</label>
             <label class="chk-label"><input type="checkbox" id="chk-fechamento" onchange="settings.confirmClose = this.checked"> Confirmar no Fechamento</label>
@@ -195,15 +229,13 @@
 </main>
 
 <script>
-    // LISTA DE ATIVOS ATUALIZADA
     const ASSETS = ["EUR/USD", "GBP/USD", "AUD/CAD", "EUR/JPY", "BTC/USD", "ETH/USD", "XAUUSD", "SOL/USD", "EUR/CAD", "XRP/USD", "USD INDEX"];
-    
     let selectedAssets = new Set(ASSETS);
     let selectedTFs = new Set(['M1', 'M5']);
     let selectedVelas = new Set(['Atual', 'Próxima']);
     
-    let lockedSignals = new Map(); // Trava Anti-Repintura
-    let pendingSignalsList = [];   // Array para Auto-Cancelamento
+    let lockedSignals = new Map(); 
+    let pendingSignalsList = [];   
     
     let settings = { popup: true, confirmClose: false };
     let isPaused = false;
@@ -223,14 +255,20 @@
     }
 
     function init() {
+        // Força fechar o menu no celular ao abrir a página
+        if(window.innerWidth <= 768) {
+            document.getElementById('sidebar').classList.add('hidden');
+        }
+
         document.getElementById('asset-selector').innerHTML = ASSETS.map(a => 
             `<div class="tag-btn active" id="ast-${a.replace(/[\/\s]/g,'')}" onclick="toggleAsset('${a}')">${a}</div>`
         ).join('');
+        
         updateStatHeader();
         updatePresets();
         setInterval(updateClock, 1000);
         setInterval(generateSignal, 4000); 
-        setInterval(checkPendingTimeouts, 1000); // Motor Anti-Ruído e Cancelamento
+        setInterval(checkPendingTimeouts, 1000);
     }
 
     function syncVal(el, targetId) { document.getElementById(targetId).innerText = el.value; }
@@ -244,7 +282,6 @@
         document.getElementById('stat-badges-vela').innerHTML = Array.from(selectedVelas).map(v => `<span class="header-badge vela">${v}</span>`).join('');
     }
 
-    // PRESETS AVANÇADOS RSI E MACD
     function setValues(p, up, dw, mf, ms, msig) {
         document.getElementById('cfg-rsi-p').value = p; syncVal(document.getElementById('cfg-rsi-p'), 'val-rsi-p');
         document.getElementById('cfg-rsi-up').value = up; syncVal(document.getElementById('cfg-rsi-up'), 'val-rsi-up');
@@ -260,19 +297,16 @@
         const lockMsg = document.getElementById('ind-lock-msg');
 
         if (hasTodas) {
-            // BLOQUEIA se Todas estiver selecionado
             sliders.forEach(s => s.disabled = true);
             lockMsg.style.display = 'inline';
-            setValues(21, 80, 20, 21, 34, 9); // Conservador padrão
+            setValues(21, 80, 20, 21, 34, 9);
         } else {
-            // DESBLOQUEIA
             sliders.forEach(s => s.disabled = false);
             lockMsg.style.display = 'none';
-            
             if (selectedTFs.size === 1) {
                 if (selectedTFs.has('M1')) setValues(7, 85, 15, 7, 13, 9);
                 else if (selectedTFs.has('M5')) setValues(14, 80, 20, 14, 26, 9);
-                else if (selectedTFs.has('M10') || selectedTFs.has('M15')) setValues(21, 80, 20, 21, 34, 9); // Conservador M10/M15
+                else if (selectedTFs.has('M10') || selectedTFs.has('M15')) setValues(21, 80, 20, 21, 34, 9);
             }
         }
         updateStatHeader();
@@ -356,7 +390,6 @@
         const price = (Math.random() * 5000 + 100).toFixed(4);
         const rsi = (type === 'COMPRA' ? (Math.random() * 20 + 5) : (Math.random() * 20 + 80)).toFixed(1); 
         
-        // Define status inicial
         let isConfirmed = !settings.confirmClose || velaType === 'Atual';
         let rowId = 'row-' + Date.now();
         
@@ -391,7 +424,6 @@
         if(lockedSignals.size > 200) lockedSignals.clear();
     }
 
-    // REGRA 4: TIMEOUT AUTOMÁTICO PARA SINAIS PENDENTES
     function checkPendingTimeouts() {
         const now = new Date();
         for (let i = pendingSignalsList.length - 1; i >= 0; i--) {
@@ -405,25 +437,15 @@
             let diffSec = (targetDate.getTime() - now.getTime()) / 1000;
             if (diffSec < -40000) { targetDate.setDate(targetDate.getDate() + 1); diffSec = (targetDate.getTime() - now.getTime()) / 1000; }
 
-            // Thresholds baseados no TF
-            let threshold = 0;
-            if (sig.tf === 'M1') threshold = 5;
-            else if (sig.tf === 'M5') threshold = 10;
-            else threshold = 30; // M10 e M15
+            let threshold = sig.tf === 'M1' ? 5 : (sig.tf === 'M5' ? 10 : 30);
 
             if (diffSec <= threshold && diffSec > 0) {
                 sig.checked = true; 
-                
-                // Simula re-análise do RSI
                 let currentRSI = Math.random() * 100;
-                let isCanceled = false;
-                if (sig.type === 'VENDA' && currentRSI < 75) isCanceled = true;
-                if (sig.type === 'COMPRA' && currentRSI > 25) isCanceled = true;
-
+                let isCanceled = (sig.type === 'VENDA' && currentRSI < 75) || (sig.type === 'COMPRA' && currentRSI > 25);
                 let row = document.getElementById(sig.id);
 
                 if (isCanceled) {
-                    // EXCLUÍDO/REMOVIDO
                     if (row) {
                         row.style.background = 'rgba(255,59,59,0.1)';
                         row.innerHTML = `<td colspan="8" style="text-align:center; color:var(--red);">Sinal Removido: Exaustão RSI Perdida (${sig.pair})</td>`;
@@ -433,7 +455,6 @@
                     stats.total--; stats.pend--;
                     if (sig.type === 'COMPRA') stats.buy--; else stats.sell--;
                 } else {
-                    // MANTÉM FORÇA E CONFIRMA
                     if (row) row.querySelector('.status-cell').innerHTML = '<span class="status-conf">✓ Confirmado</span>';
                     stats.pend--; stats.conf++;
                 }
@@ -454,7 +475,8 @@
                 <div class="popup-header">Sinal de ${type}</div>
                 <div class="popup-grid">
                     <div><span>Ativo:</span><b>${pair}</b></div>
-                    <div></div> <div><span>Timeframe:</span><b>${tf}</b></div>
+                    <div></div> 
+                    <div><span>Timeframe:</span><b>${tf}</b></div>
                     <div><span>${labelVela}</span><b>${candleTime}</b></div>
                     <div><span>Preço:</span><b>${price}</b></div>
                     <div><span>RSI:</span><b>${rsi}</b></div>
