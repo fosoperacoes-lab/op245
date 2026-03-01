@@ -3,209 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OP245-G | Mentor Elite v2.2</title>
+    <title>OP245-M1M5 2.0 | Trading Monitor</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #060809; --card-bg: #11151a; --sidebar-bg: #0d1117;
-            --green: #00C805; --red: #FF3B3B; --blue: #2196F3;
-            --border: #1e2329; --text-muted: #848e9c;
+            --bg-body: #050a0e; --bg-sidebar: #0b1217; --bg-card: #0e161e;
+            --border: #1c262e; --text-main: #e1e4e8; --text-dim: #707a8a;
+            --green: #00c805; --red: #ff3b3b; --blue: #2196f3; --yellow: #f3ba2f;
         }
 
-        body { background: var(--bg-dark); color: white; font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        body { 
+            background: var(--bg-body); color: var(--text-main); font-family: 'Inter', sans-serif; 
+            margin: 0; display: flex; height: 100vh; overflow: hidden; font-size: 13px;
+        }
 
-        /* PAINEL LATERAL */
-        #sidebar { width: 340px; background: var(--sidebar-bg); border-right: 1px solid var(--border); padding: 20px; overflow-y: auto; z-index: 100; }
-        .config-group { margin-bottom: 25px; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
-        .config-title { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        /* HEADER SUPERIOR */
+        .top-nav {
+            position: fixed; top: 0; left: 0; right: 0; height: 45px;
+            background: var(--bg-sidebar); border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center; padding: 0 20px; z-index: 1000;
+        }
+
+        /* PAINEL LATERAL (DIREITA) */
+        #sidebar { 
+            width: 280px; background: var(--bg-sidebar); border-left: 1px solid var(--border); 
+            padding: 60px 15px 15px; overflow-y: auto; height: 100%;
+        }
+
+        /* CONTEÚDO PRINCIPAL */
+        #main { flex: 1; padding: 65px 20px 20px; overflow-y: auto; }
+
+        /* CARDS DE ESTATÍSTICAS */
+        .stats-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 25px; }
+        .stat-card { background: var(--bg-card); padding: 15px; border-radius: 6px; border: 1px solid var(--border); }
+        .stat-card span { color: var(--text-dim); font-size: 11px; display: block; margin-bottom: 10px; }
+        .stat-card h2 { margin: 0; font-size: 24px; font-weight: 600; }
+
+        /* TABELA DE SINAIS */
+        .table-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+        .table-header { padding: 15px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; color: var(--yellow); }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background: #0c141b; color: var(--text-dim); font-weight: 400; padding: 12px; font-size: 11px; text-transform: uppercase; }
+        td { padding: 10px 12px; border-bottom: 1px solid #141d26; font-size: 12px; }
+
+        /* COMPONENTES DE UI */
+        .badge-signal { padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 10px; color: white; display: inline-block; }
+        .badge-buy { background: rgba(0, 200, 5, 0.25); color: var(--green); border: 1px solid var(--green); }
+        .badge-sell { background: rgba(255, 59, 59, 0.25); color: var(--red); border: 1px solid var(--red); }
+        .badge-tf { background: var(--blue); padding: 2px 6px; border-radius: 3px; font-size: 10px; }
+        .badge-status { color: var(--blue); font-size: 10px; border: 1px solid var(--blue); padding: 2px 8px; border-radius: 12px; }
+
+        /* CONFIGURAÇÕES SIDEBAR */
+        .config-section { margin-bottom: 20px; }
+        .config-label { font-size: 12px; margin-bottom: 10px; display: block; font-weight: 600; }
+        .btn-group { display: flex; gap: 5px; margin-bottom: 10px; }
+        .mini-btn { flex: 1; background: #1e2329; border: 1px solid var(--border); color: white; padding: 6px; border-radius: 4px; font-size: 11px; cursor: pointer; }
+        .mini-btn.active { background: var(--blue); border-color: var(--blue); }
         
-        /* BOTÕES DE ATIVOS */
-        .pairs-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-        .asset-btn { background: #1e2329; border: 1px solid var(--border); color: white; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 0.7rem; text-align: center; }
-        .asset-btn.active { background: var(--blue); border-color: var(--blue); font-weight: bold; }
-        .bulk-btn { background: transparent; border: 1px solid #2b3139; color: var(--text-muted); padding: 5px 8px; border-radius: 4px; cursor: pointer; font-size: 0.65rem; }
+        input[type="range"] { width: 100%; margin: 8px 0; accent-color: var(--blue); }
+        .slider-val { float: right; color: var(--text-dim); }
 
-        /* SLIDERS CONFIGURAÇÃO */
-        .slider-wrap { margin: 15px 0; }
-        .slider-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; }
-        input[type="range"] { width: 100%; accent-color: var(--blue); cursor: pointer; }
-        .val-tag { color: white; font-weight: bold; }
-
-        /* ÁREA PRINCIPAL */
-        #main { flex: 1; padding: 20px; overflow-y: auto; }
-        .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 25px; }
-        .stat-item { background: var(--card-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border); text-align: center; }
-        
-        #popups { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; width: 300px; }
-        .popup-card { background: var(--card-bg); border-left: 5px solid var(--blue); padding: 15px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: slide 0.3s ease-out; }
-
-        @keyframes slide { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .asset-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+        .asset-tag { background: #1e2329; border: 1px solid var(--border); padding: 5px; font-size: 9px; text-align: center; border-radius: 3px; cursor: pointer; }
+        .asset-tag.active { background: var(--blue); color: white; }
     </style>
 </head>
 <body>
 
-<aside id="sidebar">
-    <div class="config-group">
-        <div class="config-title">Timeframe</div>
-        <div style="display: flex; gap: 8px;">
-            <button class="asset-btn" onclick="setTF('M1')">M1</button>
-            <button class="asset-btn active" onclick="setTF('M5')">M5</button>
-            <button class="asset-btn" onclick="setTF('M10')">M10</button>
-            <button class="asset-btn" onclick="setTF('M15')">M15</button>
-        </div>
+<nav class="top-nav">
+    <div style="display:flex; align-items:center; gap:10px;">
+        <span style="color:var(--blue); font-weight:bold;">OP245-M1M5 2.0</span>
+        <small style="color:var(--text-dim)">Trading Monitor</small>
     </div>
-
-    <div class="config-group">
-        <div class="config-title">
-            Pares Monitorados
-            <div>
-                <button class="bulk-btn" onclick="toggleAll(true)">Todos</button>
-                <button class="bulk-btn" onclick="toggleAll(false)">Nenhum</button>
-            </div>
-        </div>
-        <div class="pairs-container" id="asset-grid"></div>
+    <div style="display:flex; gap:15px; align-items:center;">
+        <span style="font-size:18px;">🔔</span>
+        <span style="font-size:18px;">⚙️</span>
     </div>
-
-    <div class="config-group">
-        <div class="config-title">Parâmetros RSI</div>
-        <div class="slider-wrap">
-            <div class="slider-label">Período <span id="rsi-p-val" class="val-tag">14</span></div>
-            <input type="range" id="rsi-p" min="5" max="30" value="14" oninput="updateValues()">
-        </div>
-        <div class="slider-wrap">
-            <div class="slider-label">Sobrecompra <span id="rsi-up-val" class="val-tag">80</span></div>
-            <input type="range" id="rsi-up" min="70" max="95" value="80" oninput="updateValues()">
-        </div>
-        <div class="slider-wrap">
-            <div class="slider-label">Sobrevenda <span id="rsi-down-val" class="val-tag">20</span></div>
-            <input type="range" id="rsi-down" min="5" max="30" value="20" oninput="updateValues()">
-        </div>
-    </div>
-
-    <div class="config-group">
-        <div class="config-title">Parâmetros MACD</div>
-        <div class="slider-wrap">
-            <div class="slider-label">EMA Rápida <span id="macd-f-val" class="val-tag">12</span></div>
-            <input type="range" id="macd-f" min="5" max="25" value="12" oninput="updateValues()">
-        </div>
-        <div class="slider-wrap">
-            <div class="slider-label">EMA Lenta <span id="macd-s-val" class="val-tag">26</span></div>
-            <input type="range" id="macd-s" min="20" max="50" value="26" oninput="updateValues()">
-        </div>
-    </div>
-</aside>
+</nav>
 
 <main id="main">
-    <div class="stats-bar">
-        <div class="stat-item"><span>TOTAL</span><h2 id="st-total">0</h2></div>
-        <div class="stat-item" style="color:var(--green)"><span>COMPRA</span><h2 id="st-buy">0</h2></div>
-        <div class="stat-item" style="color:var(--red)"><span>VENDA</span><h2 id="st-sell">0</h2></div>
-        <div class="stat-item" style="color:var(--blue)"><span>WIN %</span><h2>100%</h2></div>
+    <div class="stats-grid">
+        <div class="stat-card"><span>Total</span><h2 id="st-total">0</h2></div>
+        <div class="stat-card"><span>Compra</span><h2 id="st-buy" style="color:var(--green)">0</h2></div>
+        <div class="stat-card"><span>Venda</span><h2 id="st-sell" style="color:var(--red)">0</h2></div>
+        <div class="stat-card"><span>Confirmados</span><h2 id="st-conf" style="color:var(--blue)">0</h2></div>
+        <div class="stat-card"><span>Pendentes</span><h2 id="st-pend" style="color:var(--yellow)">0</h2></div>
+        <div class="stat-card"><span>% Confirmação</span><h2 style="color:var(--blue)">100.0%</h2></div>
     </div>
 
-    <div id="display-card" style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 50px; text-align: center; margin-bottom: 25px;">
-        <p style="color: var(--text-muted); font-size: 0.9rem;">AGUARDANDO SINAL NOS ATIVOS SELECIONADOS...</p>
-    </div>
-
-    <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;">
-        <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
-            <thead style="background: #1e2329; color: var(--text-muted);">
-                <tr><th style="padding:12px; text-align:left;">Hora</th><th>Par</th><th>Sinal</th><th>TF</th><th>Vela</th><th>Status</th></tr>
+    <div class="table-section">
+        <div class="table-header">
+            <span>🔔</span> <b>Últimos Sinais (máx. 20 visíveis)</b>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Hora</th><th>Par</th><th>Sinal</th><th>TF</th><th>Vela</th><th>Preço</th><th>RSI</th><th>MACD</th><th>Status</th>
+                </tr>
             </thead>
-            <tbody id="history-rows" style="text-align:center;"></tbody>
+            <tbody id="signal-rows">
+                </tbody>
         </table>
     </div>
 </main>
 
-<div id="popups"></div>
+<aside id="sidebar">
+    <div class="config-section">
+        <span class="config-label">Timeframe</span>
+        <div class="btn-group">
+            <button class="mini-btn" onclick="setTF('M1', this)">M1</button>
+            <button class="mini-btn active" onclick="setTF('M5', this)">M5</button>
+        </div>
+        <div style="font-size:11px; color:var(--text-dim); margin-top:10px;">
+            <input type="checkbox" checked> Mostrar Alertas Pop-up<br>
+            <input type="checkbox" checked> Confirmar no Fechamento
+        </div>
+    </div>
+
+    <div class="config-section">
+        <span class="config-label">Filtro de Vela</span>
+        <div class="btn-group">
+            <button class="mini-btn">Atual</button>
+            <button class="mini-btn">Próxima</button>
+            <button class="mini-btn active">Todas</button>
+        </div>
+    </div>
+
+    <div class="config-section">
+        <span class="config-label">RSI <span class="slider-val" id="rsi-v">14</span></span>
+        <input type="range" min="2" max="30" value="14" oninput="document.getElementById('rsi-v').innerText=this.value">
+    </div>
+
+    <div class="config-section">
+        <span class="config-label">Pares Monitorados</span>
+        <div class="asset-grid">
+            <div class="asset-tag active">EUR/USD</div><div class="asset-tag active">GBP/USD</div><div class="asset-tag active">AUD/CAD</div>
+            <div class="asset-tag active">EUR/JPY</div><div class="asset-tag active">EUR/CAD</div><div class="asset-tag active">BTC/USD</div>
+            <div class="asset-tag active">ETH/USD</div><div class="asset-tag active">SOL/USD</div><div class="asset-tag active">XRP/USD</div>
+        </div>
+    </div>
+</aside>
 
 <script>
-    const ASSETS = ["EUR/USD", "GBP/USD", "AUD/CAD", "EUR/JPY", "EUR/CAD", "BTC/USD", "ETH/USD", "SOL/USD", "XRP/USD", "XAUUSD", "USD INDEX"];
-    let activeAssets = new Set(ASSETS);
-    let currentTF = 'M5';
-    const usedSignals = new Set();
+    const pairs = ["EUR/USD", "GBP/USD", "BTC/USD", "EUR/CAD", "XAUUSD", "ETH/USD"];
+    let stats = { total: 0, buy: 0, sell: 0, conf: 0 };
 
-    function initAssets() {
-        const grid = document.getElementById('asset-grid');
-        grid.innerHTML = ASSETS.map(a => `<button class="asset-btn active" id="btn-${a}" onclick="toggleAsset('${a}')">${a}</button>`).join('');
-    }
-
-    function toggleAsset(a) {
-        const btn = document.getElementById(`btn-${a}`);
-        activeAssets.has(a) ? (activeAssets.delete(a), btn.classList.remove('active')) : (activeAssets.add(a), btn.classList.add('active'));
-    }
-
-    function toggleAll(status) {
-        ASSETS.forEach(a => {
-            const btn = document.getElementById(`btn-${a}`);
-            status ? (activeAssets.add(a), btn.classList.add('active')) : (activeAssets.delete(a), btn.classList.remove('active'));
-        });
-    }
-
-    function updateValues() {
-        const configMap = ['rsi-p', 'rsi-up', 'rsi-down', 'macd-f', 'macd-s'];
-        configMap.forEach(id => {
-            const el = document.getElementById(id);
-            if(el) document.getElementById(id+'-val').innerText = el.value;
-        });
-    }
-
-    function setTF(tf) {
-        currentTF = tf;
-        document.querySelectorAll('.asset-btn').forEach(b => { if(b.innerText.length < 4) b.classList.remove('active') });
-        event.target.classList.add('active');
+    function addSignal() {
+        const pair = pairs[Math.floor(Math.random() * pairs.length)];
+        const type = Math.random() > 0.5 ? 'COMPRA' : 'VENDA';
+        const price = (Math.random() * 5000 + 1000).toFixed(2);
+        const rsi = (Math.random() * 100).toFixed(1);
+        const macd = (Math.random() * 2 - 1).toFixed(4);
         
-        // Ajuste Automático Conforme Timeframe
-        if(tf === 'M1') setParams(7, 85, 15, 7, 13);
-        else if(tf === 'M5') setParams(14, 80, 20, 12, 26);
-        else setParams(21, 80, 20, 21, 42); // Conservador M10/M15
+        stats.total++;
+        type === 'COMPRA' ? stats.buy++ : stats.sell++;
+        stats.conf++;
+        updateUI();
+
+        const row = `
+            <tr>
+                <td>${new Date().toLocaleTimeString()}</td>
+                <td><b>${pair}</b></td>
+                <td><span class="badge-signal ${type === 'COMPRA' ? 'badge-buy' : 'badge-sell'}">${type}</span></td>
+                <td><span class="badge-tf">M5</span></td>
+                <td>${new Date().getHours()}:${new Date().getMinutes()}:00</td>
+                <td>${price}</td>
+                <td>${rsi}</td>
+                <td style="color:${macd > 0 ? 'var(--green)' : 'var(--red)'}">${macd}</td>
+                <td><span class="badge-status">✓ Confirmado</span></td>
+            </tr>
+        `;
+
+        const tbody = document.getElementById('signal-rows');
+        tbody.insertAdjacentHTML('afterbegin', row);
+
+        if(tbody.children.length > 20) {
+            tbody.lastElementChild.remove();
+        }
     }
 
-    function setParams(rp, ru, rd, mf, ms) {
-        document.getElementById('rsi-p').value = rp;
-        document.getElementById('rsi-up').value = ru;
-        document.getElementById('rsi-down').value = rd;
-        document.getElementById('macd-f').value = mf;
-        document.getElementById('macd-s').value = ms;
-        updateValues();
+    function updateUI() {
+        document.getElementById('st-total').innerText = stats.total;
+        document.getElementById('st-buy').innerText = stats.buy;
+        document.getElementById('st-sell').innerText = stats.sell;
+        document.getElementById('st-conf').innerText = stats.conf;
     }
 
-    function pushSignal(par, tipo) {
-        if(!activeAssets.has(par)) return;
-        const key = `${par}-${new Date().getMinutes()}`;
-        if(usedSignals.has(key)) return; // Trava 1 sinal/vela
-
-        usedSignals.add(key);
-        renderSignal(par, tipo);
-    }
-
-    function renderSignal(par, tipo) {
-        const color = tipo === 'COMPRA' ? 'var(--green)' : 'var(--red)';
-        const card = document.getElementById('display-card');
-        card.style.borderColor = color;
-        card.innerHTML = `<h1 style="color:${color}; margin:0;">${tipo}</h1><h2>${par}</h2><small>${currentTF} | Filtro DXY Confirmado</small>`;
-        
-        // Popup Superior Direito
-        const popId = Date.now();
-        const popHtml = `<div class="popup-card" id="${popId}" style="border-left-color:${color}">
-            <b style="color:${color}">${tipo}: ${par}</b><br><small>Confirmar na Próxima Vela</small>
-        </div>`;
-        document.getElementById('popups').insertAdjacentHTML('afterbegin', popHtml);
-        setTimeout(() => document.getElementById(popId)?.remove(), 6000);
-
-        // Histórico
-        const row = `<tr><td>${new Date().toLocaleTimeString()}</td><td><b>${par}</b></td><td style="color:${color}">${tipo}</td><td>${currentTF}</td><td>Próxima</td><td><span style="color:var(--blue)">✓ Confirmado</span></td></tr>`;
-        document.getElementById('history-rows').insertAdjacentHTML('afterbegin', row);
-    }
-
-    initAssets();
-    updateValues();
-
-    // Simulação Autônoma Inteligente
-    setInterval(() => {
-        const p = ASSETS[Math.floor(Math.random()*ASSETS.length)];
-        if(Math.random() > 0.97) pushSignal(p, Math.random() > 0.5 ? 'COMPRA' : 'VENDA');
-    }, 4000);
+    // Gerar sinal inicial e ciclo
+    for(let i=0; i<5; i++) addSignal();
+    setInterval(addSignal, 8000);
 </script>
+
 </body>
 </html>
