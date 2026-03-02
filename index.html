@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OP245-G Sinais v4.6</title>
+    <title>OP245-G Sinais v4.7</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-body: #050a0e; --bg-sidebar: #0b1217; --bg-card: #0e161e;
             --border: #1c262e; --text-main: #e1e4e8; --text-dim: #707a8a;
-            --green: #00c805; --red: #ff3b3b; --blue: #2196f3; --yellow: #f3ba2f;
+            --green: #00ff00; /* Verde mais vivo para o popup */
+            --green-grid: #00c805;
+            --red: #ff3b3b; --blue: #2196f3; --yellow: #f3ba2f;
             --cyan: #00e5ff;
         }
 
-        /* Correção global de box-sizing para evitar vazamentos de layout */
         *, *::before, *::after { box-sizing: border-box; }
 
         body { 
@@ -28,7 +29,7 @@
             display: flex; justify-content: space-between; align-items: center; padding: 0 15px; z-index: 1000;
         }
 
-        /* SIDEBAR (MENU LATERAL) */
+        /* SIDEBAR */
         #sidebar { 
             width: 320px; background: var(--bg-sidebar); border-right: 1px solid var(--border); 
             padding: 65px 15px 15px; overflow-y: auto; height: 100%;
@@ -54,17 +55,16 @@
         .stat-card span { color: var(--text-dim); font-size: 11px; display: block; margin-bottom: 4px; white-space: nowrap; }
         .stat-card h2 { margin: 0; font-size: 18px; font-weight: 600; }
 
-        /* TABELA DE SINAIS (COM SCROLL HORIZONTAL) */
+        /* TABELA DE SINAIS */
         .table-section { 
             background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; 
-            overflow-x: auto; /* Permite rolar a tabela em celulares */
-            -webkit-overflow-scrolling: touch; /* Rolagem suave no iOS */
+            overflow-x: auto; -webkit-overflow-scrolling: touch; 
         }
-        table { width: 100%; border-collapse: collapse; min-width: 750px; /* Trava a largura mínima para as colunas não sumirem */ }
+        table { width: 100%; border-collapse: collapse; min-width: 750px; }
         th { background: #0c141b; color: var(--text-dim); padding: 12px 10px; font-size: 10px; text-transform: uppercase; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
         td { padding: 10px; border-bottom: 1px solid #141d26; font-size: 12px; white-space: nowrap; transition: 0.3s; }
 
-        .badge-buy { color: var(--green); border: 1px solid var(--green); padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 10px; }
+        .badge-buy { color: var(--green-grid); border: 1px solid var(--green-grid); padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 10px; }
         .badge-sell { color: var(--red); border: 1px solid var(--red); padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 10px; }
         .status-conf { color: var(--blue); border: 1px solid var(--blue); padding: 2px 6px; border-radius: 12px; font-size: 10px; }
         .status-pend { color: var(--yellow); border: 1px solid var(--yellow); padding: 2px 6px; border-radius: 12px; font-size: 10px; }
@@ -95,46 +95,64 @@
         input[type="range"]:disabled { opacity: 0.4; cursor: not-allowed; }
         input[type="range"]:disabled::-webkit-slider-thumb { background: #555; }
 
-        /* POPUP DESIGN */
+        /* NOVO POPUP (BASEADO NA IMAGEM ENVIADA) */
         #popup-container { position: fixed; top: 60px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        
         .popup-alert { 
-            padding: 15px; border-radius: 8px; width: 280px; 
-            animation: slideIn 0.3s ease-out; pointer-events: all; box-shadow: 0 10px 25px rgba(0,0,0,0.6);
-            color: white; font-family: 'Inter', sans-serif; border: 1px solid rgba(255,255,255,0.2);
+            background: #0b1522; /* Fundo azul escuro */
+            border: 1px solid #1c262e;
+            padding: 15px; 
+            border-radius: 4px; 
+            width: 270px; 
+            animation: slideIn 0.3s ease-out; 
+            pointer-events: all; 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.7);
+            color: #e1e4e8; 
+            font-family: 'Inter', sans-serif; 
         }
-        .popup-green { background: #00a004; }
-        .popup-red { background: #d32f2f; }
-        .popup-header { text-align: center; font-weight: 700; font-size: 14px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 1px; }
-        .popup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 11px; }
-        .popup-grid span { opacity: 0.8; display: block; margin-bottom: 2px; }
-        .popup-grid b { font-size: 14px; font-weight: 600; }
+
+        .popup-title { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            font-size: 18px; 
+            font-weight: 700; 
+            text-transform: uppercase;
+            border-bottom: 1px solid #1c262e; 
+            padding-bottom: 12px; 
+            margin-bottom: 12px; 
+        }
+
+        .popup-circle { width: 16px; height: 16px; border-radius: 50%; display: inline-block; }
+        
+        /* Cores dinâmicas para o título do popup */
+        .txt-buy { color: var(--green); }
+        .txt-sell { color: var(--red); }
+        .bg-buy { background: var(--green); }
+        .bg-sell { background: var(--red); }
+
+        .popup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 10px; }
+        .p-item { display: flex; flex-direction: column; }
+        .p-label { font-size: 12px; color: #e1e4e8; margin-bottom: 2px; font-weight: 400; }
+        .p-val { font-size: 20px; font-weight: 300; color: white; letter-spacing: 0.5px; }
 
         @keyframes slideIn { from { transform: translateX(110%); } to { transform: translateX(0); } }
         @keyframes fadeOutRow { to { opacity: 0; transform: scale(0.98); } }
 
-        /* MEDIA QUERIES PARA CELULARES E TABLETS */
-        @media (max-width: 900px) {
-            .stats-grid { grid-template-columns: repeat(3, 1fr); } /* Tablet: 3 colunas */
-        }
-
+        /* RESPONSIVO */
+        @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } }
         @media (max-width: 600px) {
-            .stats-grid { grid-template-columns: repeat(2, 1fr); } /* Celular: 2 colunas */
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
             .stat-card h2 { font-size: 16px; }
-            
             #sidebar {
                 position: fixed; top: 50px; left: 0; height: calc(100vh - 50px);
                 z-index: 1001; margin-left: 0; transform: translateX(0);
                 box-shadow: 5px 0 20px rgba(0,0,0,0.8); width: 290px;
             }
             #sidebar.hidden { transform: translateX(-100%); }
-            
-            #popup-container {
-                top: 60px; right: 0; left: 0; align-items: center; width: 100%;
-            }
+            #popup-container { top: 60px; right: 0; left: 0; align-items: center; width: 100%; }
             .popup-alert { width: 90%; max-width: 320px; animation: slideDown 0.3s ease-out; }
-            
             @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-            @keyframes slideIn { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         }
     </style>
 </head>
@@ -143,7 +161,7 @@
 <nav class="top-nav">
     <div style="display:flex; align-items:center; gap:8px;">
         <span class="icon-btn" onclick="toggleSidebar()">⚙️</span>
-        <span style="color:var(--blue); font-weight:bold; font-size: 14px;">OP245-G v4.6</span>
+        <span style="color:var(--blue); font-weight:bold; font-size: 14px;">OP245-G v4.7</span>
     </div>
     <div style="display:flex; gap:10px; align-items:center;">
         <span id="btn-audio" class="icon-btn" onclick="toggleAudio()">🔊</span>
@@ -211,7 +229,7 @@
 
     <div class="stats-grid">
         <div class="stat-card"><span>Total</span><h2 id="st-total">0</h2></div>
-        <div class="stat-card"><span>Compra</span><h2 id="st-buy" style="color:var(--green)">0</h2></div>
+        <div class="stat-card"><span>Compra</span><h2 id="st-buy" style="color:var(--green-grid)">0</h2></div>
         <div class="stat-card"><span>Venda</span><h2 id="st-sell" style="color:var(--red)">0</h2></div>
         <div class="stat-card"><span>Confirmados</span><h2 id="st-conf" style="color:var(--blue)">0</h2></div>
         <div class="stat-card"><span>Pendentes</span><h2 id="st-pend" style="color:var(--yellow)">0</h2></div>
@@ -221,7 +239,7 @@
     <div class="table-section">
         <table>
             <thead>
-                <tr><th>Hora Sinal</th><th>Par</th><th>Sinal</th><th>TF</th><th>Vela (Abertura)</th><th>Preço</th><th>RSI</th><th>Status</th></tr>
+                <tr><th>Hora Sinal</th><th>Par</th><th>Sinal</th><th>TF</th><th>Vela</th><th>Preço</th><th>RSI</th><th>Status</th></tr>
             </thead>
             <tbody id="signal-rows"></tbody>
         </table>
@@ -255,10 +273,7 @@
     }
 
     function init() {
-        // Força fechar o menu no celular ao abrir a página
-        if(window.innerWidth <= 768) {
-            document.getElementById('sidebar').classList.add('hidden');
-        }
+        if(window.innerWidth <= 768) document.getElementById('sidebar').classList.add('hidden');
 
         document.getElementById('asset-selector').innerHTML = ASSETS.map(a => 
             `<div class="tag-btn active" id="ast-${a.replace(/[\/\s]/g,'')}" onclick="toggleAsset('${a}')">${a}</div>`
@@ -406,15 +421,18 @@
         updateStatsUI();
 
         const statusBadge = isConfirmed ? '<span class="status-conf">✓ Confirmado</span>' : '<span class="status-pend">⏳ Pendente</span>';
+        
+        // Lógica de exibição da Vela na Tabela
+        let displayVela = velaType === 'Atual' ? 'Atual' : candleTime;
 
         const row = `<tr id="${rowId}">
             <td>${new Date().toLocaleTimeString()}</td>
             <td><b>${pair}</b></td>
             <td><span class="${type === 'COMPRA' ? 'badge-buy' : 'badge-sell'}">${type}</span></td>
             <td><span style="background:var(--blue); padding:2px 5px; border-radius:3px; font-size:10px; color:white;">${tf}</span></td>
-            <td style="font-family:monospace; font-size:12px;">${candleTime} <span style="font-size:9px; color:var(--text-dim)">(${velaType})</span></td>
+            <td style="font-family:monospace; font-size:12px; font-weight: 600; color: white;">${displayVela}</td>
             <td>${price}</td>
-            <td style="color:${type === 'COMPRA' ? 'var(--green)' : 'var(--red)'}">${rsi}</td>
+            <td style="color:${type === 'COMPRA' ? 'var(--green-grid)' : 'var(--red)'}">${rsi}</td>
             <td class="status-cell">${statusBadge}</td>
         </tr>`;
         
@@ -467,19 +485,23 @@
 
     function showPopup(pair, type, tf, velaType, candleTime, price, rsi) {
         const id = Date.now();
-        const popupClass = type === 'COMPRA' ? 'popup-green' : 'popup-red';
-        const labelVela = velaType === 'Próxima' ? 'Próxima Vela:' : 'Vela Atual:';
+        
+        const titleClass = type === 'COMPRA' ? 'txt-buy' : 'txt-sell';
+        const bgClass = type === 'COMPRA' ? 'bg-buy' : 'bg-sell';
 
         const html = `
-            <div class="popup-alert ${popupClass}" id="${id}">
-                <div class="popup-header">Sinal de ${type}</div>
+            <div class="popup-alert" id="${id}">
+                <div class="popup-title ${titleClass}">
+                    <span class="popup-circle ${bgClass}"></span>
+                    SINAL DE ${type}
+                </div>
                 <div class="popup-grid">
-                    <div><span>Ativo:</span><b>${pair}</b></div>
-                    <div></div> 
-                    <div><span>Timeframe:</span><b>${tf}</b></div>
-                    <div><span>${labelVela}</span><b>${candleTime}</b></div>
-                    <div><span>Preço:</span><b>${price}</b></div>
-                    <div><span>RSI:</span><b>${rsi}</b></div>
+                    <div class="p-item"><span class="p-label">Ativo</span><span class="p-val">${pair}</span></div>
+                    <div class="p-item"><span class="p-label">Vela</span><span class="p-val" style="text-transform:uppercase;">${velaType}</span></div>
+                    <div class="p-item"><span class="p-label">TimeFrame</span><span class="p-val">${tf}</span></div>
+                    <div class="p-item"><span class="p-label">Proxima Vela</span><span class="p-val">${candleTime}</span></div>
+                    <div class="p-item"><span class="p-label">Preço</span><span class="p-val">${price}</span></div>
+                    <div class="p-item"><span class="p-label">RSI</span><span class="p-val">${rsi}</span></div>
                 </div>
             </div>`;
             
